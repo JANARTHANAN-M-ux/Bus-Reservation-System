@@ -1,0 +1,194 @@
+import java.util.Scanner;
+
+class Bus {
+    int busNumber;
+    String source;
+    String destination;
+    int totalSeats;
+    int availableSeats;
+    float fare;
+}
+
+class Passenger {
+    String name;
+    int age;
+    int seatNumber;
+    int busNumber;
+}
+
+class User {
+    String username;
+    String password;
+}
+
+public class Main {
+    public static void displayMainMenu() {
+        System.out.println("\n=== Bus Reservation System ===");
+        System.out.println("1. Login");
+        System.out.println("2. Exit");
+        System.out.print("Enter your choice: ");
+    }
+
+    public static void displayUserMenu() {
+        System.out.println("\n=== User Menu ===");
+        System.out.println("1. Book a Ticket");
+        System.out.println("2. Cancel a Ticket");
+        System.out.println("3. Check Bus Status");
+        System.out.println("4. Logout");
+        System.out.print("Enter your choice: ");
+    }
+
+    public static int loginUser(User[] users, int numUsers, String username, String password) {
+        for (int i = 0; i < numUsers; i++) {
+            if (users[i].username.equals(username) && users[i].password.equals(password)) {
+                return i; // Return the index of the logged-in user
+            }
+        }
+        return -1; // Return -1 if login fails
+    }
+
+    public static void bookTicket(Bus[] buses, int numBuses, Passenger[] passengers, int[] numPassengers, int userId) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\nEnter Bus Number: ");
+        int busNumber = scanner.nextInt();
+        // Find the bus with the given busNumber
+        int busIndex = -1;
+        for (int i = 0; i < numBuses; i++) {
+            if (buses[i].busNumber == busNumber) {
+                busIndex = i;
+                break;
+            }
+        }
+        if (busIndex == -1) {
+            System.out.printf("Bus with Bus Number %d not found.\n", busNumber);
+        } else if (buses[busIndex].availableSeats == 0) {
+            System.out.println("Sorry, the bus is fully booked.");
+        } else {
+            System.out.print("Enter Passenger Name: ");
+            String name = scanner.next();
+            System.out.print("Enter Passenger Age: ");
+            int age = scanner.nextInt();
+            // Assign a seat number to the passenger
+            int seatNumber = buses[busIndex].totalSeats - buses[busIndex].availableSeats + 1;
+            // Update the passenger's bus number
+            int passengerBusNumber = busNumber;
+            // Update available seats
+            buses[busIndex].availableSeats--;
+            System.out.println("Ticket booked successfully!");
+            passengers[*numPassengers] = new Passenger();
+            passengers[*numPassengers].name = name;
+            passengers[*numPassengers].age = age;
+            passengers[*numPassengers].seatNumber = seatNumber;
+            passengers[*numPassengers].busNumber = passengerBusNumber;
+            (*numPassengers)++;
+        }
+    }
+
+    public static void cancelTicket(Bus[] buses, int numBuses, Passenger[] passengers, int[] numPassengers, int userId) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\nEnter Passenger Name: ");
+        String name = scanner.next();
+        boolean found = false;
+        for (int i = 0; i < *numPassengers; i++) {
+            if (passengers[i].name.equals(name) && passengers[i].busNumber == buses[userId].busNumber) {
+                // Increase available seats
+                int busIndex = -1;
+                for (int j = 0; j < numBuses; j++) {
+                    if (buses[j].busNumber == passengers[i].busNumber) {
+                        busIndex = j;
+                        break;
+                    }
+                }
+                buses[busIndex].availableSeats++;
+                // Remove the passenger entry
+                for (int j = i; j < (*numPassengers) - 1; j++) {
+                    passengers[j] = passengers[j + 1];
+                }
+                (*numPassengers)--;
+                found = true;
+                System.out.println("Ticket canceled successfully!");
+                break;
+            }
+        }
+        if (!found) {
+            System.out.printf("Passenger with name %s not found on this bus.\n", name);
+        }
+    }
+
+    public static void checkBusStatus(Bus[] buses, int numBuses, int userId) {
+        System.out.println("\nBus Number: " + buses[userId].busNumber);
+        System.out.println("Source: " + buses[userId].source);
+        System.out.println("Destination: " + buses[userId].destination);
+        System.out.println("Total Seats: " + buses[userId].totalSeats);
+        System.out.println("Available Seats: " + buses[userId].availableSeats);
+        System.out.println("Fare: " + buses[userId].fare);
+    }
+
+    public static void main(String[] args) {
+        // Initialize user data
+        User[] users = {
+            new User("user1", "password1"),
+            new User("user2", "password2"),
+            new User("user3", "password3"),
+            new User("user4", "password4"),
+            new User("user5", "password5")
+        };
+        int numUsers = 5;
+        // Initialize bus data
+        Bus[] buses = {
+            new Bus(101, "City A", "City B", 50, 50, 25.0),
+            new Bus(102, "City C", "City D", 40, 40, 20.0),
+            new Bus(103, "City E", "City F", 30, 30, 15.0)
+        };
+        int numBuses = 3;
+        Passenger[] passengers = new Passenger[500]; // Array to store passenger information
+        int numPassengers = 0; // Number of passengers
+        int loggedInUserId = -1; // Index of the logged-in user
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            if (loggedInUserId == -1) {
+                displayMainMenu();
+                int choice = scanner.nextInt();
+                if (choice == 1) {
+                    System.out.print("Enter Username: ");
+                    String username = scanner.next();
+                    System.out.print("Enter Password: ");
+                    String password = scanner.next();
+                    loggedInUserId = loginUser(users, numUsers, username, password);
+                    if (loggedInUserId == -1) {
+                        System.out.println("Login failed. Please check your username and password.");
+                    } else {
+                        System.out.printf("Login successful. Welcome, %s!\n", username);
+                    }
+                } else if (choice == 2) {
+                    System.out.println("Exiting the program.");
+                    break;
+                } else {
+                    System.out.println("Invalid choice. Please try again.");
+                }
+            } else {
+                displayUserMenu();
+                int userChoice = scanner.nextInt();
+                switch (userChoice) {
+                    case 1:
+                        bookTicket(buses, numBuses, passengers, numPassengers, loggedInUserId);
+                        break;
+                    case 2:
+                        cancelTicket(buses, numBuses, passengers, numPassengers, loggedInUserId);
+                        break;
+                    case 3:
+                        checkBusStatus(buses, numBuses, loggedInUserId);
+                        break;
+                    case 4:
+                        System.out.println("Logging out.");
+                        loggedInUserId = -1;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            }
+        }
+    }
+}
+
+
